@@ -7,8 +7,8 @@ on:
 jobs:
   performance-test:
     runs-on: ubuntu-latest
-
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -24,19 +24,17 @@ jobs:
           tar -xzf apache-jmeter-5.6.3.tgz
           mv apache-jmeter-5.6.3 jmeter
 
-      - name: Create directories
+      - name: Run Performance Tests
         run: |
-          mkdir -p reports results
-
-      - name: Run JMeter Tests
-        run: |
+          mkdir -p reports
           jmeter/bin/jmeter -n \
             -t tests/load_test.jmx \
             -l results/results.jtl \
-            -e -o reports
+            -e -o reports/
 
-      - name: Upload HTML Report
-        uses: actions/upload-artifact@v3
+      - name: Upload HTML Report as Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: jmeter-report
-          path: reports
+          path: reports/
