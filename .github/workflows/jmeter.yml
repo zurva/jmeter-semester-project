@@ -21,19 +21,18 @@ jobs:
       - name: Download Apache JMeter
         run: |
           wget -q https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz
-          tar -xzf apache-jmeter-5.6.3.tgz
-          mv apache-jmeter-5.6.3 jmeter
+          tar -xzf apache-jmeter-5.6.3.tgz && mv apache-jmeter-5.6.3 jmeter
 
       - name: Run Performance Tests
         run: |
-          mkdir -p reports
+          mkdir -p results reports
           jmeter/bin/jmeter -n \
             -t tests/load_test.jmx \
             -l results/results.jtl \
             -e -o reports/
 
       - name: Upload HTML Report as Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: jmeter-report
