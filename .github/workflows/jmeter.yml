@@ -1,6 +1,5 @@
 name: JMeter Performance Tests
 
-# Trigger workflow on push to main branch
 on:
   push:
     branches: [ main ]
@@ -10,36 +9,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout your repository
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Java 11
+      # 2️⃣ Set up Java 11
       - name: Set up Java 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
 
-      # Step 3: Download Apache JMeter
+      # 3️⃣ Download Apache JMeter
       - name: Download Apache JMeter
         run: |
           wget -q https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.6.3.tgz
           tar -xzf apache-jmeter-5.6.3.tgz
           mv apache-jmeter-5.6.3 jmeter
 
-      # Step 4: Run JMeter Load Test
-      - name: Run JMeter Load Test
+      # 4️⃣ Run JMeter test in non-GUI mode
+      - name: Run Performance Tests
         run: |
           mkdir -p results reports
-          jmeter/bin/jmeter -n \
-            -t tests/load_test.jmx \
-            -l results/results.jtl \
-            -e -o reports/
+          jmeter/bin/jmeter -n -t tests/load_test.jmx -l results/results.jtl -e -o reports/
 
-      # Step 5: Upload the HTML report as an artifact
-      - name: Upload HTML Report
-        uses: actions/upload-artifact@v3
+      # 5️⃣ Ensure reports folder exists
+      - name: List reports folder
+        run: |
+          ls -R reports/
+
+      # 6️⃣ Upload HTML report as artifact (v4)
+      - name: Upload HTML Report as Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: jmeter-report
+          name: jmeter-html-report
           path: reports/
